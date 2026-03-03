@@ -102,19 +102,25 @@ WSGI_APPLICATION = "bookMyShow.bookMyShow.wsgi.application"
 # Database
 # https://docs.djangoproject.com/en/6.0/ref/settings/#databases
 
-DATABASES = {
-    "default": {
-        "ENGINE": "django.db.backends.sqlite3",
-        "NAME": BASE_DIR / "db.sqlite3",
-    }
-}
-
-if os.getenv("DATABASE_URL"):
+DATABASES = {}
+database_url = os.getenv("DATABASE_URL")
+if database_url:
     DATABASES["default"] = dj_database_url.parse(
-        os.getenv("DATABASE_URL"),
+        database_url,
         conn_max_age=600,
         ssl_require=True,
     )
+else:
+    sqlite_path = BASE_DIR / "db.sqlite3"
+    # Vercel filesystem is read-only except /tmp.
+    if os.getenv("VERCEL") == "1":
+        sqlite_path = Path("/tmp/db.sqlite3")
+    DATABASES = {
+        "default": {
+            "ENGINE": "django.db.backends.sqlite3",
+            "NAME": sqlite_path,
+        }
+    }
 
 # Password validation
 # https://docs.djangoproject.com/en/6.0/ref/settings/#auth-password-validators
