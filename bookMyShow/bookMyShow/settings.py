@@ -10,8 +10,10 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/6.0/ref/settings/
 """
 
-from pathlib import Path
 import os
+from pathlib import Path
+
+import dj_database_url
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -21,12 +23,30 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/6.0/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = "django-insecure-r$-o^0p#)p-d33ryt=q3ig^c#2fh(qnkyfjrptd)u4y5-he8sn"
+SECRET_KEY = os.getenv(
+    "SECRET_KEY",
+    "django-insecure-r$-o^0p#)p-d33ryt=q3ig^c#2fh(qnkyfjrptd)u4y5-he8sn",
+)
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+debug_env = os.getenv("DEBUG")
+if debug_env is None:
+    # Local default: enable debug unless running on Vercel.
+    DEBUG = os.getenv("VERCEL") != "1"
+else:
+    debug_value = debug_env.strip().lower()
+    if debug_value in {"1", "true", "yes", "on"}:
+        DEBUG = True
+    elif debug_value in {"0", "false", "no", "off"}:
+        DEBUG = False
+    else:
+        DEBUG = os.getenv("VERCEL") != "1"
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = [
+    host.strip()
+    for host in os.getenv("ALLOWED_HOSTS", "127.0.0.1,localhost,.vercel.app").split(",")
+    if host.strip()
+]
 
 
 # Application definition
@@ -55,8 +75,8 @@ MIDDLEWARE = [
 AUTH_USER_MODEL = "auth.User"
 EMAIL_BACKEND = "django.core.mail.backends.console.EmailBackend"
 
-MEDIA_URL = '/media/'
-MEDIA_ROOT = os.path.join(BASE_DIR,'media')
+MEDIA_URL = "/media/"
+MEDIA_ROOT = os.path.join(BASE_DIR, "media")
 
 ROOT_URLCONF = "bookMyShow.bookMyShow.urls"
 LOGIN_URL = "/login/"
@@ -89,6 +109,12 @@ DATABASES = {
     }
 }
 
+if os.getenv("DATABASE_URL"):
+    DATABASES["default"] = dj_database_url.parse(
+        os.getenv("DATABASE_URL"),
+        conn_max_age=600,
+        ssl_require=True,
+    )
 
 # Password validation
 # https://docs.djangoproject.com/en/6.0/ref/settings/#auth-password-validators
@@ -124,4 +150,9 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/6.0/howto/static-files/
 
-STATIC_URL = "static/"
+STATIC_URL = "/static/"
+STATIC_ROOT = BASE_DIR / "staticfiles"
+
+SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https")
+SESSION_COOKIE_SECURE = not DEBUG
+CSRF_COOKIE_SECURE = not DEBUG

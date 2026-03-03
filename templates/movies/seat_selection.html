@@ -36,6 +36,9 @@
       <div class="card">
         <div class="card-body">
           <h5 class="card-title text-center mb-4">Select Your Seats</h5>
+          {% if error %}
+          <div class="alert alert-danger" role="alert">{{ error }}</div>
+          {% endif %}
           <div class="screen">All eyes this way please!</div>
 
           <form method="POST">

@@ -47,14 +47,17 @@ def theater_list(request, movie_id):
 
 @login_required(login_url='/login/')
 def book_seats(request, theater_id):
-    # Rename the dictionary key to 'theaters' to match your HTML header
     theaters = get_object_or_404(Theater, id=theater_id)
     seats = Seat.objects.filter(theater=theaters)
     if request.method == 'POST':
         selected_Seats = request.POST.getlist('seats')
         error_seats = []
         if not selected_Seats:
-            return render(request,"movies/seat_selection.html", {'theater':theaters,"seats":seats,'error':"No seat selected"})
+            return render(
+                request,
+                "movies/seat_selection.html",
+                {"theaters": theaters, "seats": seats, "error": "No seat selected"},
+            )
         for seat_id in selected_Seats:
             seat = get_object_or_404(Seat,id = seat_id,theater = theaters)
             if seat.is_booked:
@@ -73,7 +76,11 @@ def book_seats(request, theater_id):
                 error_seats.append(seat.seat_number)
         if error_seats:
             error_message = f"The following seats are already booked: {','.join(error_seats)}"
-            return render(request,'movies/seat_selection.html',{'theater':theaters,"seats":seats,'error':"No seat selected"})
+            return render(
+                request,
+                "movies/seat_selection.html",
+                {"theaters": theaters, "seats": seats, "error": error_message},
+            )
         return redirect('profile')
     return render(request, 'movies/seat_selection.html', {'theaters': theaters, "seats": seats})
 # The "Connection Pin":

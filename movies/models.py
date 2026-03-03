@@ -98,5 +98,3 @@ class Booking(models.Model):
     
     def __str__(self):
         return f'Booking by {self.user.username} in {self.seat.seat_number} at {self.theater.name}'
-    
-a = str()
