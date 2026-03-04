@@ -7,7 +7,7 @@ class CustomLogoutView(auth_views.LogoutView):
         return self.post(request, *args, **kwargs)
 
 urlpatterns = [
-    path ('',home,name = 'home'),
+    path('',home,name='home'),
     path('register/', register, name='register'),
     path('login/', login_view, name='login'),
     path('profile/', profile, name='profile'),

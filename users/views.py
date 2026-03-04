@@ -1,13 +1,16 @@
 from django.contrib.auth.forms import AuthenticationForm, PasswordChangeForm
 from .forms import UserRegisterForm, UserUpdateForm
 from django.shortcuts import render, redirect
-from django.contrib.auth import login, authenticate
+from django.contrib.auth import login, authenticate, update_session_auth_hash
 from django.contrib.auth.decorators import login_required
 from movies.models import Movie, Booking
 
+
 def home(request):
     movies = Movie.objects.all()
-    return render(request,'home.html', {'movies':movies})
+    return render(request, "home.html", {"movies": movies})
+
+
 def register(request):
     if request.method == "POST":
         form = UserRegisterForm(request.POST)
@@ -18,9 +21,10 @@ def register(request):
             password = form.cleaned_data.get("password1")
 
             user = authenticate(username=username, password=password)
-            login(request, user)
+            if user is not None:
+                login(request, user)
+                return redirect("profile")
 
-            return redirect("profile")
     else:
         form = UserRegisterForm()
 
@@ -42,7 +46,7 @@ def login_view(request):
 
 @login_required
 def profile(request):
-    bookings = Booking.objects.filter(user = request.user)
+    bookings = Booking.objects.filter(user=request.user)
     if request.method == "POST":
         u_form = UserUpdateForm(request.POST, instance=request.user)
         if u_form.is_valid():
@@ -51,7 +55,7 @@ def profile(request):
     else:
         u_form = UserUpdateForm(instance=request.user)
 
-    return render(request, "users/profile.html", {"u_form": u_form,'bookings':bookings})
+    return render(request, "users/profile.html", {"u_form": u_form, "bookings": bookings})
 
 
 @login_required
@@ -59,7 +63,8 @@ def reset_password(request):
     if request.method == "POST":
         form = PasswordChangeForm(user=request.user, data=request.POST)
         if form.is_valid():
-            form.save()
+            user = form.save()
+            update_session_auth_hash(request, user)
             return redirect("login")
     else:
         form = PasswordChangeForm(user=request.user)
