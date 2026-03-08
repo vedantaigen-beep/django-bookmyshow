@@ -57,7 +57,9 @@ AUTH_USER_MODEL='auth.User'
 EMAIL_BACKEND='django.core.mail.backends.console.EmailBackend'
 
 MEDIA_URL = '/media/'
-MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
+ON_VERCEL = os.getenv('VERCEL') == '1'
+MEDIA_ROOT = '/tmp/media' if ON_VERCEL else os.path.join(BASE_DIR, 'media')
+
 
 
 ROOT_URLCONF = 'bookMyShow.bookMyShow.urls'
