@@ -14,8 +14,10 @@ https://docs.djangoproject.com/en/5.1/ref/settings/
 from pathlib import Path
 import os
 import dj_database_url
+
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
+PROJECT_ROOT = BASE_DIR.parent
 
 
 # Quick-start development settings - unsuitable for production
@@ -27,7 +29,7 @@ SECRET_KEY = 'django-insecure-c8aetlj(=vp90n@#yoc^&d(_6ivp(d!bv-4-f!r$lawptjzrwu
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['.vercel.app']
+ALLOWED_HOSTS = ['127.0.0.1', 'localhost', '.vercel.app']
 
 
 # Application definition
@@ -41,6 +43,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'users',
     'movies',
+    'django_apscheduler'
 ]
 
 MIDDLEWARE = [
@@ -54,12 +57,18 @@ MIDDLEWARE = [
 ]
 
 AUTH_USER_MODEL='auth.User'
-EMAIL_BACKEND='django.core.mail.backends.console.EmailBackend'
+EMAIL_BACKEND='django.core.mail.backends.smtp.EmailBackend'
+EMAIL_HOST = 'smtp.gmail.com'
+EMAIL_PORT = 587
+EMAIL_USE_TLS = True
+EMAIL_HOST_USER = 'vedantaigen@gmail.com'
+EMAIL_HOST_PASSWORD = 'tejdixbabzsvxzpz'
+DEFAULT_FROM_EMAIL = EMAIL_HOST_USER
+
 
 MEDIA_URL = '/media/'
 ON_VERCEL = os.getenv('VERCEL') == '1'
 MEDIA_ROOT = '/tmp/media' if ON_VERCEL else os.path.join(BASE_DIR, 'media')
-
 
 
 ROOT_URLCONF = 'bookMyShow.bookMyShow.urls'
@@ -67,7 +76,7 @@ LOGIN_URL='/login/'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': ['templates'],
+        'DIRS': [PROJECT_ROOT / 'templates'],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -86,12 +95,19 @@ WSGI_APPLICATION = 'bookMyShow.bookMyShow.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/5.1/ref/settings/#databases
 
-DATABASES = {
-    'default': dj_database_url.parse(
-        'postgresql://django_bookmyshow_btkq_user:zXpV1peoreTcRZ9i8GCDhmwv3upTfNH2@dpg-d6ik5vruibrs73en4ac0-a.oregon-postgres.render.com/django_bookmyshow_btkq'
-    )
-}
-# 
+database_url = os.getenv('DATABASE_URL')
+
+if database_url:
+    DATABASES = {
+        'default': dj_database_url.parse(database_url)
+    }
+else:
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.sqlite3',
+            'NAME': BASE_DIR / 'db.sqlite3',
+        }
+    }
 
 # Password validation
 # https://docs.djangoproject.com/en/5.1/ref/settings/#auth-password-validators
@@ -133,3 +149,13 @@ STATIC_URL = 'static/'
 # https://docs.djangoproject.com/en/5.1/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+RAZORPAY_KEY_ID = 'rzp_test_ShhmoSyo6LGYBs'
+RAZORPAY_KEY_SECRET = 'eNh3ykaGku0NQfNlYMoz0NQ6'
+
+CACHES = {
+    "default": {
+        "BACKEND": "django.core.cache.backends.locmem.LocMemCache",
+        "LOCATION": "bookmyseat-cache",
+    }
+}

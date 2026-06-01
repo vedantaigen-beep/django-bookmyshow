@@ -42,6 +42,14 @@ class Movie(models.Model): # So, because of models.Model this is not normal clas
     cast = models.TextField()
     description = models.TextField(blank = True, null = True)
     
+    # youtube_trailer - first task..
+    # step 1: Step 1 — models.py
+    # You added a new column trailer_url to the Movie table in the database. Nothing more. The database now has a place to store a YouTube link for each movie.
+    trailer_url = models.URLField(blank=True,null=True) # blank=True handles the form side (don't force the user to fill it), and null=True handles the database side (allow empty storage). Both are needed because Django separates those two concerns.
+    
+    genre = models.CharField(max_length=100, blank=True, null=True)
+    language = models.CharField(max_length=100, blank=True, null=True)
+    
     def __str__(self): # This is like a label tag suppose we have 100 identical boxes in warehouse and i know each boxes is of 'Movies' but it seems without label 'box1' and 'box2' by label it's easy to pick boxes according to required label from the box like {The Result: Instead of seeing "Box 1, Box 2," you see "Avatar, Batman, Inception."}
         return self.name
     
@@ -89,12 +97,52 @@ class Seat(models.Model):
     
 # The Logic: This is your Transaction Record. It doesn't create a movie or a seat; it just records that a specific person "owns" a specific seat for a specific time.
 
+
+# ------------------------------------------------------------------------------------
 class Booking(models.Model):
     user = models. ForeignKey(User, on_delete = models.CASCADE)
     seat = models. OneToOneField(Seat, on_delete = models.CASCADE) # OneToOneField: This is the most important part. It ensures one seat can only have one booking. If you try to book the same seat twice, the database will block it.
     movie = models. ForeignKey(Movie, on_delete = models.CASCADE)
     theater = models. ForeignKey(Theater, on_delete = models.CASCADE)
-    booked_at = models.DateTimeField(auto_now_add = True)
+    booked_at = models.DateTimeField(auto_now_add = True, db_index=True)
+    is_cancelled = models.BooleanField(default = False, db_index=True)
     
     def __str__(self):
         return f'Booking by {self.user.username} in {self.seat.seat_number} at {self.theater.name}'
+
+class SeatReservation(models.Model):
+    user = models.ForeignKey(
+        User, 
+        on_delete=models.CASCADE,
+    )
+    seat = models.ForeignKey(Seat, on_delete=models.CASCADE)
+    expires_at = models.DateTimeField()
+    STATUS_CHOICES = [('pending','Pending'), ('confirmed','Confirmed')]
+    status = models.CharField(max_length=10, choices=STATUS_CHOICES, default='pending')
+
+    def __str__(self):
+        return f'{self.user.username} reserved {self.seat.seat_number} until {self.expires_at}'
+    
+
+class Payment(models.Model):
+    STATUS_CHOICES = [
+        ('created','Created'),
+        ('paid', 'Paid'),
+        ('failed','Failed'),
+    ]
+    
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    seats = models.ManyToManyField(Seat)
+    theater = models.ForeignKey(Theater, on_delete=models.CASCADE)
+    
+    razorpay_order_id = models.CharField(max_length=100, unique=True)
+    razorpay_payment_id = models.CharField(max_length=100,blank=True, null=True)
+    razorpay_signature = models.CharField(max_length=255,  blank=True, null=True)
+    
+    status = models.CharField(max_length=10, choices=STATUS_CHOICES, default='created', db_index=True)
+    
+    created_at = models.DateTimeField(auto_now_add=True, db_index=True)
+    amount = models.IntegerField(default=0)  # stored in paise
+    
+    def __str__(self):
+        return f'Payment by {self.user.username} - {self.status}'

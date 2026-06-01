@@ -1,5 +1,7 @@
 from django.contrib import admin
 from .models import Movie,Theater,Seat,Booking
+from .models import Movie, Theater, Seat, Booking, Payment
+from .models import Movie, Theater, Seat, Booking, SeatReservation
 
 @admin.register(Movie)
 class MovieAdmin(admin.ModelAdmin):
@@ -18,7 +20,14 @@ class SeatAdmin(admin.ModelAdmin):
 @admin.register(Booking)
 class BookingAdmin(admin.ModelAdmin):
     list_display = ['user','seat','movie','theater','booked_at']
-
+    
+@admin.register(Payment)
+class PaymentAdmin(admin.ModelAdmin):
+    list_display = ['user', 'status','razorpay_order_id','created_at']
+    
+@admin.register(SeatReservation)
+class SeatReservationAdmin(admin.ModelAdmin):
+    list_display = ['user', 'seat', 'status', 'expires_at']
 # --------------------------------------------------------------------------------------------------------------------------
 # 🛠️ The 3-Step Logic of admin.py
 # 1. The "Entry Ticket" (The Decorator)

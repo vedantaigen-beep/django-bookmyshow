@@ -1,0 +1,96 @@
+{% extends "users/basic.html" %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="card shadow mx-auto" style="max-width: 500px;">
+        <div class="card-body py-4">
+            
+            <h3 class="text-center mb-4">Complete Your Booking</h3>
+            
+            <div class="mb-4">
+                <p><strong>Movie:</strong> {{ theater.movie.name }}</p>
+                <p><strong>Theater:</strong> {{ theater.name }}</p>
+                <p><strong>Show Time:</strong> {{ theater.time }}</p>
+                <p><strong>Seats:</strong> 
+                    {% for seat in seats %}
+                        {{ seat.seat_number }}{% if not forloop.last %}, {% endif %}
+                    {% endfor %}
+                </p>
+                <p><strong>Total Amount:</strong> ₹{% widthratio amount 100 1 %}</p>
+            </div>
+            
+            <hr>
+            
+            <div class="text-center">
+                <button id="pay-btn" class="btn btn-success btn-lg">
+                    Pay Now ₹{% widthratio amount 100 1 %}
+                </button>
+            </div>
+            
+        </div>
+    </div>
+</div>
+
+<script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+
+<script>
+    var options = {
+    "key": "{{ razorpay_key_id }}",
+    "amount": "{{ amount }}",
+    "currency": "INR",
+    "name": "BookMySeat",
+    "description": "Movie Ticket Booking",
+    "order_id": "{{ razorpay_order_id }}",
+    
+    // add this line to disable card saving
+    "save": 0,
+    
+    "handler": function(response) {
+            var form = document.createElement('form');
+            form.method = 'POST';
+            form.action = '/movies/payment/verify/';
+            
+            var csrf = document.createElement('input');
+            csrf.type = 'hidden';
+            csrf.name = 'csrfmiddlewaretoken';
+            csrf.value = '{{ csrf_token }}';
+            form.appendChild(csrf);
+            
+            var fields = {
+                'razorpay_order_id': response.razorpay_order_id,
+                'razorpay_payment_id': response.razorpay_payment_id,
+                'razorpay_signature': response.razorpay_signature,
+            };
+            
+            for (var key in fields) {
+                var input = document.createElement('input');
+                input.type = 'hidden';
+                input.name = key;
+                input.value = fields[key];
+                form.appendChild(input);
+            }
+            
+            document.body.appendChild(form);
+            form.submit();
+        },
+        "modal": {
+            "ondismiss": function() {
+                alert('Payment cancelled. Your seats will be released shortly.');
+            }
+        },
+        "prefill": {
+            "name": "{{ request.user.username }}",
+            "email": "{{ request.user.email }}"
+        },
+        "theme": {
+            "color": "#28a745"
+        }
+    };
+    
+    document.getElementById('pay-btn').onclick = function() {
+        var rzp = new Razorpay(options);
+        rzp.open();
+    }
+</script>
+
+{% endblock %}

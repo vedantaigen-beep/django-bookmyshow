@@ -1,0 +1,228 @@
+<!-- For email template — you do NOT use (% extends %) like other .html
+files use.. Why? Because: Email has no navbar. No footer. No Bootstrap. No
+Django admin bar. Nothing from basic.html. -->
+
+<!doctype html>
+<html>
+  <head>
+    <style>
+      .container {
+        max-width: 600px;
+        margin: 30px auto;
+        background-color: #1a1a2e;
+        border-radius: 10px;
+        overflow: hidden;
+        font-family:Arial,sans-serif;
+      }
+
+      /* Header */
+      .header {
+        background-color: #4a0072;
+        color: #ffffff;
+        padding: 28px 32px;
+        text-align: center;
+      }
+
+      .brand-name {
+        color: #ffffff;
+        font-size: 22px;
+        font-weight: bold;
+        margin-bottom: 18px;
+      }
+      .check-circle {
+        width: 50px;
+        height: 50px;
+        border: 2px solid #f5a623;
+        border-radius: 50%; /* ← this makes a square become a circle */
+        margin: 0 auto 14px;
+        color: #f5a623;
+        font-size: 24px;
+        line-height: 50px; /* ← this vertically centers the ✓ inside */
+      }
+      .confirm-title {
+        color: #ffffff;
+        font-size: 22px;
+        font-weight: bold;
+        margin: 0 0 6px;
+      }
+      .confirm-subtitle {
+        color: rgba(
+          255,
+          255,
+          255,
+          0.75
+        ); /* ← white but 75% transparent = soft white */
+        font-size: 14px;
+        margin: 0;
+      }
+
+      .body {
+        background-color: #fdf6e3; /* ← warm cream color  , if not showing then make browser in light mode*/
+        padding: 32px;
+        margin-bottom: 0;
+      }
+      .greeting {
+        font-size: 20px;
+        font-weight: bold;
+        color: #1a1a2e;
+        text-align: center;
+        margin: 0 0 6px;
+      }
+
+      .subtext {
+        font-size: 14px;
+        color: #555555;
+        text-align: center;
+        margin: 0 0 24px;
+      }
+
+      .details-card {
+        background-color: #ffffff;
+        border: 1.5px solid #f5a623; /* ← orange border */
+        border-radius: 10px;
+        padding: 20px;
+      }
+
+      .detail-row {
+        display: flex;
+        justify-content: space-between;
+        padding: 12px 0;
+        border-bottom: 1px dashed #eeeeee;
+        gap: 16px;
+      }
+
+      .detail-row:last-child {
+        border-bottom: none;
+      }
+
+      .detail-label {
+        font-weight: bold;
+        color: #1a1a2e;
+      }
+
+      .detail-value {
+        color: #1a1a2e;
+        font-weight: 600;
+      }
+
+      .enjoy {
+        font-size: 18px;
+        font-weight: Bold;
+        color: #f5a623;
+        text-align: center;
+        margin: 24px 0 0;
+      }
+
+      .footer {
+        background-color: #eba835;
+        padding: 20px;
+        text-align: center;
+        color: rgba(255, 255, 255, 0.6);
+        font-size: 12px;
+      }
+
+      .footer p {
+        /* Selects ALL p tags INSIDE .footer */
+        color: #1a1a2e;
+        font-size: 13px;
+        margin: 0 0 6px;
+        margin-bottom: 0;
+
+      }
+
+      .footer p:last-child { margin: 0; } /* ONLY last p (paragraph) inside .footer This removes bottom margin from only the very last <p> tag within .footer. */
+    </style>
+  </head>
+
+  <body>
+    <!-- Container: The outer card that centers everything and sets max width -->
+    <div class="container">
+      <!--
+      -------------------------------------------------------------------------------------
+      Always use lowercase for class names.Why? Because: .Container ← easy to
+      make mistakes .container ← standard, everyone follows this .CONTAINER ←
+      also works but looks wrong If one developer writes .Container and another
+      writes .container — CSS treats them as two different classes. This causes
+      bugs in team projects. So the industry agreed — always lowercase.
+      --------------------------------------------------------------------------------------------------
+      -->
+
+      <!-- Header: Dark top section — logo and booking confirmation title -->
+      <div class="header">
+        <p class="brand-name">BookMySeat</p>
+        <div class="check-circle">✓</div>
+        <h1 class="confirm-title">Booking Confirmed!</h1>
+        <p class="confirm-subtitle">Your seats are reserved. Enjoy the show!</p>
+      </div>
+
+      <!-- Body: White middle section — greeting and booking details -->
+      <div style="background-color:#fdf6e3; padding:32px; margin-bottom:0;">
+        <p style="font-size:20px; font-weight:bold; color:#1a1a2e; text-align:center; margin:0 0 6px;">
+          Hi {{ user_name }}! 👋
+        </p>
+        <p style="font-size:14px; color:#555555; text-align:center; margin:0 0 24px;">
+          Your booking is confirmed. Here are your details:
+        </p>
+        <div style="background-color:#ffffff; border:1.5px solid #f5a623; border-radius:10px; padding:20px;">
+          <div style="display:flex; justify-content:space-between; align-items:center; padding:12px 0; border-bottom:1px dashed #eeeeee;">
+            <span style="font-weight:bold; color:#1a1a2e;">🎬 Movie</span>
+            <span style="color:#1a1a2e; font-weight:600;">{{ movie_name }}</span>
+          </div>
+
+          <div style="display:flex; justify-content:space-between; align-items:center; padding:12px 0; border-bottom:1px dashed #eeeeee;">
+            <span style="font-weight:bold; color:#1a1a2e;">🏛 Theater</span>
+            <span style="color:#1a1a2e; font-weight:600;">{{ theater_name }}</span>
+          </div>
+
+          <div style="display:flex; justify-content:space-between; align-items:center; padding:12px 0;  border-bottom:1px dashed #eeeeee;">
+            <span style="font-weight:bold; color:#1a1a2e;">🕐 Show Time</span>
+            <span style="color:#1a1a2e; font-weight:600;">{{ show_time }}</span>
+          </div>
+          <div style="display:flex; justify-content:space-between; align-items:center; padding:12px 0; border-bottom:1px dashed #eeeeee;">
+            <span style="font-weight:bold; color:#1a1a2e;">🪑 Seat</span>
+            <span style="color:#1a1a2e; font-weight:600;">{{ seat_number }}</span>
+          </div>
+          <div style="display:flex; justify-content:space-between; align-items:center; padding:12px 0;">
+            <span style="font-weight:bold; color:#1a1a2e;">📅 Booked On</span>
+            <span style="color:#1a1a2e; font-weight:600;">{{ booked_at }}</span>
+          </div>
+        </div>
+
+        <p style="font-size:18px; font-weight:bold; color:#f5a623; text-align:center; margin:24px 0 0;">
+          Enjoy the show! 🍿
+        </p>
+      </div>
+
+      <!-- Footer: Dark bottom section — automated email notice and copyright -->
+      <div style="background-color:#eba835; padding:20px; text-align:center;">
+        <p style="color:#1a1a2e; font-size:13px; margin:0 0 6px;">This is an automated email. Please do not reply.</p>
+        <p style="color:#1a1a2e; font-size:13px; margin:0;">&copy; 2024 BookMySeat. All rights reserved.</p>
+      </div>
+    </div>
+  </body>
+</html>
+
+<!-- How things use to decorate html page through css..
+┌─────────────────────────────┐  ← margin (space outside)
+│   ┌─────────────────────┐   │
+│   │  padding (space     │   │
+│   │  inside)            │   │
+│   │   ┌─────────────┐   │   │
+│   │   │   CONTENT   │   │   │
+│   │   │  (text/img) │   │   │
+│   │   └─────────────┘   │   │
+│   └─────────────────────┘   │
+└─────────────────────────────┘
+| Property         | Simple meaning                                            | Example                       |
+| ---------------- | --------------------------------------------------------- | ----------------------------- |
+| margin           | Space outside the element — pushes other elements away    | Gap between two cards         |
+| padding          | Space inside the element — pushes content away from edges | Space between text and border |
+| width            | How wide the element is                                   | 600px wide container          |
+| height           | How tall the element is                                   | 400px tall banner             |
+| border-radius    | Rounds the corners                                        | Rounded button                |
+| color            | Text color                                                | White text                    |
+| background-color | Background color of element                               | Dark blue header              |
+| font-size        | How big the text is                                       | 24px heading                  |
+| font-weight      | How bold the text is                                      | Bold title                    |
+| text-align       | Where text sits horizontally                              | Centered text                 |
+-->

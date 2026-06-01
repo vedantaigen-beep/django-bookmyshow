@@ -1,0 +1,66 @@
+<!-- =========================
+STATE 1: INITIAL
+========================= -->
+- poster.size = large
+- poster.position = left / hero
+- playButton = visible (floating on poster)
+- background = normal
+
+
+<!-- =========================
+ON CLICK PLAY
+========================= -->
+
+Click ▶
+
+STEP 1 → Zoom (feels alive)
+- poster.scale = 1 → 1.05
+- duration = 200ms
+
+STEP 2 → Move to center
+- poster.position = center
+- duration = 300–400ms
+- easing = ease-in-out
+
+STEP 3 → Dark background (don’t remove it)
+- overlay.opacity = 0 → 0.85
+- overlay.blur = 5px
+
+STEP 4 → Transform to video
+- poster → videoPlayer
+- autoplay = true
+
+
+<!-- =========================
+STATE 2: FINAL (FOCUS MODE)
+========================= -->
+- video.position = center
+- video.size = medium-large
+- background = dark + blurred
+- UI = hidden (only minimal controls)
+
+
+<!-- =========================
+CORE IDEA
+========================= -->
+Poster → zoom → move → transform → focus mode
+
+
+<!-- =========================
+KEY RULES
+========================= -->
+1. NEVER instantly resize poster ❌
+   → always zoom first (scale 1 → 1.05)
+
+2. NEVER remove background ❌
+   → use dark overlay (~0.85 opacity)
+   → add blur (5px)
+
+3. Animation must feel smooth
+   → use ease-in-out
+
+
+<!-- =========================
+ONE-LINE CONCEPT
+========================= -->
+"Poster becomes the video, not replaced by it"

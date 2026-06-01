@@ -1,6 +1,6 @@
-{% extends "users/basic.html" %}
+{% extends "users/basic.html" %} <!--For normal webpages — you use (% extends %) because you want the navbar, footer and all common stuff from basic.html.-->
 
-{% block content %}
+{% block content %} <!--So from here you continue to write things which belongs to this file-->
     <div class= "container mt-4">
         <h2>You have been logged out.</h2>
         <p>Click <a href= "{% url 'login' %}">here</a> to log in again.</p>
