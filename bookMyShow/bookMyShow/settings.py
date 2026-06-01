@@ -43,8 +43,11 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'users',
     'movies',
-    'django_apscheduler'
 ]
+
+# Only add apscheduler when NOT on Vercel
+if not os.getenv('VERCEL'):
+    INSTALLED_APPS += ['django_apscheduler']
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',

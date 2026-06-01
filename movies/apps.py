@@ -14,7 +14,7 @@ class MoviesConfig(AppConfig):
     # cleaner runs every 60 seconds forever
     
     def ready(self):
-        # start the background scheduler when Django starts
-        from . import scheduler
-        scheduler.start()
-        
+        import os
+        if not os.getenv('VERCEL'):
+            from . import scheduler
+            scheduler.start()
