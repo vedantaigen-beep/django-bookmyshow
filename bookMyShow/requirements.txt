@@ -1,9 +1,12 @@
 asgiref==3.7.2
 dj-database-url
-Django==4.2.7           
+Django==4.2.7x
 gunicorn==20.1.0
 psycopg2-binary
 sqlparse==0.4.4
 typing_extensions==4.7.0
 Pillow
 razorpay
+cloudinary
+django-cloudinary-storage
+python-dotenv
