@@ -10,4 +10,4 @@ razorpay
 cloudinary
 django-cloudinary-storage
 python-dotenv
-django-apschedulerclear
+django-apscheduler
